@@ -2,142 +2,228 @@
 Análisis de tráfico de red con Wireshark sobre el protocolo Telnet en un entorno controlado. Se documenta la captura y el análisis de una sesión de autenticación, demostrando la transmisión de credenciales sin cifrado y los riesgos asociados. Incluye evidencia, metodología, observaciones técnicas y conclusiones.
 
 
-# Technical Report
+# Caso 001 – Análisis de autenticación Telnet mediante inspección de tráfico de red
 
-## Executive Summary
+## Resumen Ejecutivo
 
-A packet capture containing 897 network packets was analyzed to evaluate the behavior of the Telnet protocol during a remote authentication process.
+Se realizó un análisis de tráfico de red utilizando Wireshark con el objetivo de evaluar el comportamiento del protocolo Telnet durante un proceso de autenticación remota. El laboratorio se llevó a cabo en un entorno controlado utilizando un cliente Windows y un switch Cisco IOS configurado para aceptar conexiones Telnet.
 
-Traffic inspection confirmed the establishment of a TCP session between the client (192.168.1.92) and the Cisco IOS switch (192.168.1.244) over TCP port 23.
+Durante el análisis se capturaron **897 paquetes**, identificándose una sesión de administración remota establecida entre el cliente **192.168.1.92** y el switch **192.168.1.244** mediante el puerto **TCP 23**.
 
-Session reconstruction performed through Wireshark's **Follow TCP Stream** feature confirmed that authentication credentials were transmitted in clear text.
-
-This behavior represents a significant security weakness because any actor capable of intercepting network traffic could recover authentication data without requiring cryptographic attacks.
+La reconstrucción de la comunicación utilizando la función **Follow TCP Stream** permitió verificar que las credenciales de autenticación fueron transmitidas en texto plano. Para el laboratorio se utilizaron un usuario y una contraseña ficticios creados exclusivamente con fines educativos.
 
 ---
 
-## Scope
+# Objetivo
 
-The assessment covers the following activities:
-
-* Packet inspection
-* TCP session analysis
-* Telnet authentication
-* Stream reconstruction
-* Security assessment
+Analizar una sesión Telnet mediante captura de paquetes para identificar el comportamiento del protocolo durante el proceso de autenticación, reconstruir la comunicación entre cliente y servidor y evaluar los riesgos asociados a la transmisión de información sin cifrado.
 
 ---
 
-## Evidence Summary
+# Alcance
 
-| Evidence      | Value                                |
-| ------------- | ------------------------------------ |
-| Capture File  | analisis-telnet-no-encriptado.pcapng |
-| Tool          | Wireshark                            |
-| Protocol      | Telnet                               |
-| Transport     | TCP                                  |
-| Port          | 23                                   |
-| Client        | 192.168.1.92                         |
-| Server        | 192.168.1.244                        |
-| Device        | Cisco IOS Switch                     |
-| Total Packets | 897                                  |
+El análisis comprende:
+
+* Captura de tráfico de red.
+* Identificación de la comunicación Telnet.
+* Análisis del establecimiento de la conexión TCP.
+* Reconstrucción de la sesión mediante Follow TCP Stream.
+* Verificación del intercambio de credenciales.
+* Evaluación de los riesgos de seguridad asociados al protocolo.
 
 ---
 
-## Methodology
+# Entorno Analizado
 
-The packet capture was imported into Wireshark for inspection.
-
-Traffic associated with TCP port 23 was isolated to identify the Telnet communication between both hosts.
-
-After validating the TCP session establishment, the conversation was reconstructed using **Follow TCP Stream** to inspect the authentication exchange.
-
-The reconstructed stream confirmed that the username and password configured exclusively for this laboratory were transmitted without encryption.
-
----
-
-## Technical Analysis
-
-The network capture shows a successful TCP session established between the client workstation and the Cisco IOS switch.
-
-Packet analysis confirms the expected TCP connection sequence followed by a Telnet authentication.
-
-Unlike secure remote administration protocols such as SSH, Telnet does not provide confidentiality for transmitted information.
-
-As a consequence, authentication credentials remain visible within the packet capture and can be reconstructed directly from the TCP stream.
+| Elemento                | Valor                                     |
+| ----------------------- | ----------------------------------------- |
+| Herramienta de análisis | Wireshark                                 |
+| Protocolo               | Telnet                                    |
+| Transporte              | TCP                                       |
+| Puerto                  | 23                                        |
+| Cliente                 | 192.168.1.92                              |
+| Servidor                | 192.168.1.244                             |
+| Dispositivo             | Switch Cisco IOS (Switch.LaboratorioCasa) |
+| Total de paquetes       | 897                                       |
+| Credenciales            | Usuario y contraseña ficticios            |
 
 ---
 
-## Findings
+# Topología del laboratorio
 
-### Finding 01
+```text
+                 Red de Laboratorio
 
-**Title**
-
-Cleartext Transmission of Authentication Credentials
-
-**Severity**
-
-High
-
-**Description**
-
-The Telnet protocol transmitted authentication credentials without applying any encryption mechanism.
-
-Credential visibility was confirmed through TCP Stream reconstruction.
-
-**Impact**
-
-An attacker with access to the communication channel could recover authentication credentials and potentially gain unauthorized administrative access.
+        Cliente Windows
+         192.168.1.92
+               │
+               │ TCP/23
+               ▼
+      Switch Cisco IOS
+       192.168.1.244
+               │
+               ▼
+          Wireshark
+      Captura y análisis
+```
 
 ---
 
-### Finding 02
+# Metodología
 
-**Title**
+La captura de tráfico se inició antes del establecimiento de la conexión Telnet para registrar toda la comunicación entre el cliente y el servidor.
 
-Use of Legacy Remote Administration Protocol
+Una vez iniciada la sesión, se aplicó el filtro correspondiente al puerto TCP 23 para aislar el tráfico del protocolo Telnet.
 
-**Severity**
-
-Medium
-
-**Description**
-
-The analyzed device accepts Telnet connections for remote administration.
-
-Legacy protocols lacking encryption increase the attack surface and should not be used in production environments.
+Posteriormente se utilizó la función **Follow TCP Stream**, permitiendo reconstruir la conversación completa entre ambos dispositivos y analizar el contenido transmitido durante el proceso de autenticación.
 
 ---
 
-## Risk Assessment
+# Evidencias
 
-| Category        | Assessment  |
-| --------------- | ----------- |
-| Confidentiality | High Risk   |
-| Integrity       | Medium Risk |
-| Availability    | Low Risk    |
+## Evidencia 1 – Captura de tráfico
 
----
+Se registró una captura compuesta por **897 paquetes**, incluyendo el establecimiento de la conexión TCP y la sesión Telnet completa.
 
-## Recommendations
+**Archivo de evidencia**
 
-* Disable Telnet on network devices.
-* Enable SSH version 2 exclusively.
-* Restrict administrative access through ACLs.
-* Monitor TCP port 23 activity.
-* Remove legacy management protocols from production environments.
-* Periodically audit remote administration services.
+```text
+analisis-telnet-no-encriptado.pcapng
+```
 
 ---
 
-## Conclusion
+## Evidencia 2 – Comunicación Telnet
 
-The assessment confirms that Telnet authentication exposes credentials in clear text during network transmission.
+El tráfico correspondiente al protocolo Telnet fue identificado mediante el puerto **TCP 23**, confirmando la comunicación entre:
 
-Although the analyzed credentials were fictitious and used exclusively in a controlled laboratory, the captured traffic demonstrates why Telnet is considered an insecure protocol for remote administration.
+* Cliente: 192.168.1.92
+* Servidor: 192.168.1.244
 
-The results obtained during this assessment reinforce the importance of encrypted management protocols and illustrate how packet analysis can be used to identify security weaknesses during network forensic investigations.
+---
+
+## Evidencia 3 – Reconstrucción de la sesión
+
+Mediante **Follow TCP Stream** fue posible reconstruir completamente la comunicación entre cliente y servidor.
+
+Durante esta etapa del análisis se verificó que las credenciales utilizadas en el laboratorio fueron transmitidas en texto plano sin aplicar ningún mecanismo de cifrado.
+
+Las credenciales correspondían a un usuario y una contraseña ficticios creados exclusivamente para este entorno de pruebas.
+
+---
+
+# Análisis Técnico
+
+El análisis del tráfico permitió identificar el establecimiento de una conexión TCP entre el cliente y el switch Cisco IOS utilizando el puerto 23.
+
+Posteriormente se observó el proceso de autenticación correspondiente al protocolo Telnet. La reconstrucción de la sesión confirmó que tanto el nombre de usuario como la contraseña fueron enviados sin cifrado, característica propia del protocolo.
+
+Este comportamiento representa una debilidad de seguridad, ya que cualquier usuario con capacidad para capturar el tráfico de la red podría acceder al contenido de la comunicación y obtener las credenciales transmitidas.
+
+Durante la captura también se identificó tráfico correspondiente al protocolo SSDP hacia la dirección multicast **239.255.255.250**. Dicho tráfico no formó parte de la sesión Telnet analizada y fue descartado durante el proceso de investigación.
+
+---
+
+# Hallazgos
+
+## Hallazgo 01
+
+**Título:** Transmisión de credenciales en texto plano.
+
+**Severidad:** Alta.
+
+**Descripción**
+
+La autenticación Telnet fue transmitida sin mecanismos de cifrado, permitiendo recuperar el contenido de la sesión mediante inspección del flujo TCP.
+
+**Evidencia**
+
+Reconstrucción de la sesión utilizando **Follow TCP Stream**.
+
+**Impacto**
+
+Un atacante con acceso al tráfico de red podría interceptar las credenciales y obtener acceso no autorizado al dispositivo administrado.
+
+---
+
+## Hallazgo 02
+
+**Título:** Uso de protocolo de administración heredado.
+
+**Severidad:** Media.
+
+**Descripción**
+
+El dispositivo de red mantiene habilitado el servicio Telnet para administración remota.
+
+**Impacto**
+
+La utilización de protocolos heredados incrementa la superficie de ataque y reduce el nivel de protección de las comunicaciones administrativas.
+
+---
+
+# Evaluación del Riesgo
+
+| Categoría        | Evaluación |
+| ---------------- | ---------- |
+| Confidencialidad | Alta       |
+| Integridad       | Media      |
+| Disponibilidad   | Baja       |
+| Riesgo General   | Alto       |
+
+---
+
+# Recomendaciones
+
+* Deshabilitar el servicio Telnet en dispositivos de red.
+* Implementar SSH versión 2 como protocolo exclusivo para administración remota.
+* Restringir el acceso administrativo mediante listas de control de acceso (ACL).
+* Supervisar conexiones dirigidas al puerto TCP 23.
+* Eliminar protocolos heredados que transmitan información sin cifrado.
+* Revisar periódicamente la configuración de los dispositivos de infraestructura.
+
+---
+
+# Cadena de Análisis
+
+```text
+Captura del tráfico
+        │
+        ▼
+Filtrado TCP/23
+        │
+        ▼
+Identificación de la sesión Telnet
+        │
+        ▼
+Reconstrucción con Follow TCP Stream
+        │
+        ▼
+Verificación de credenciales
+        │
+        ▼
+Análisis de riesgos
+        │
+        ▼
+Recomendaciones
+```
+
+---
+
+# Conclusión
+
+El análisis confirmó que el protocolo Telnet transmite la información de autenticación sin aplicar mecanismos de cifrado, exponiendo las credenciales a posibles ataques de interceptación cuando un tercero tiene acceso al tráfico de la red.
+
+La utilización de Wireshark permitió reconstruir la sesión completa y verificar este comportamiento mediante evidencia obtenida directamente de la captura. Los resultados respaldan la recomendación de reemplazar Telnet por protocolos seguros como SSH para la administración remota de dispositivos de red.
+
+---
+
+# Referencias
+
+* RFC 854 – Telnet Protocol Specification.
+* Documentación oficial de Wireshark.
+* Cisco IOS Security Configuration Guide.
+* NIST SP 800-41 Rev. 1 – Guidelines on Firewalls and Firewall Policy.
 
 
 
