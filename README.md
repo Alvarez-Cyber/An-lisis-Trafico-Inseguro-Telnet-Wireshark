@@ -125,15 +125,5 @@ Durante este laboratorio reforcé conocimientos relacionados con:
 
 ---
 
-# Próximos laboratorios
-
-* Análisis de FTP mediante Wireshark.
-* Análisis de HTTP.
-* Análisis de DNS.
-* Análisis de ARP.
-* Detección de escaneo con Nmap.
-* Captura y análisis de tráfico HTTPS.
-* Introducción a Suricata.
-* Análisis de eventos con Sysmon.
 
 
